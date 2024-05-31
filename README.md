@@ -5,5 +5,4 @@
     expo install expo-splash-screen
 
     npm install react-native-progress react-native-svg
-
-
+    npm install react-native-svg
