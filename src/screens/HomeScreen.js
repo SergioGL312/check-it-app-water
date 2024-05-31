@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { Circle } from 'react-native-progress';
 
@@ -6,56 +6,78 @@ const backgroundImage = require('../../assets/fondo1.png');
 const gifImage = require('../../assets/Animation - water.gif');
 
 const HomeScreen = () => {
-  const targetWater = 2000;
-  const currentWater = 1900;
+  const targetWater = 100;
+  const currentWater = 90;
+
+  const [buttonState, setButtonState] = useState({
+    text: 'Encender',
+    backgroundColor: '#69FF3A',
+  });
+
+
+  
+    const handlePress = () => {
+      setButtonState((prevState) => ({
+        text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
+        backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
+      }));
+    };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.greeting}>Good Morning,</Text>
-      <Text style={styles.name}>Sergio GL</Text>
+    <View style={styles.maincontainer}>
+      <Text style={styles.greeting}>Hola,</Text>
+      <Text style={styles.name}>Jesús GS</Text>
       <ImageBackground source={backgroundImage} style={styles.waterContainer} imageStyle={styles.backgroundImage}>
         <Text style={styles.time}>11:00 AM</Text>
-        <Text style={styles.waterAmount}>200ml water (2 Glasses)</Text>
+        <Text style={styles.waterAmount}>Tinaco (*Capacidad*)</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Add Your Goal</Text>
+            <Text style={styles.buttonText}>Más</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button2}>
+            <Text style={styles.buttonText}>Cambiar</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
+
       <View style={styles.circleAndTargetContainer}>
         <View style={styles.circleContainer}>
           <ImageBackground source={gifImage} style={styles.gifBackground}>
             <Circle
-              size={120}
+              size={150}
               progress={currentWater / targetWater}
               showsText={false}
-              color="#ADE5FC" // 4286f4
-              thickness={10}
+              color="#ADE5FC"
+              thickness={12}
               borderColor='#F3F7FB'
             />
-            <Text style={styles.circleText}>{`${currentWater}ml`}</Text>
+            <Text style={styles.circleText}>{`${currentWater}%`}</Text>
           </ImageBackground>
         </View>
-        <View style={styles.targetContainer}>
-          <View style={styles.targetBackground}>
-            <Text style={styles.targetText}>Target</Text>
-            <Text style={styles.targetAmount}>{targetWater}ml</Text>
-          </View>
-        </View>
       </View>
-      <TouchableOpacity style={styles.dashboardButton}>
-        <Text style={styles.buttonText}>Go To Dashboard</Text>
-      </TouchableOpacity>
-      <Text style={styles.progressMessage}>You got 50% of today's goal. Keep focus on your health!</Text>
-    </View>
+      
+      <View style={styles.buttonWrapper}>
+        <TouchableOpacity
+          style={[styles.dashboardButton, { backgroundColor: buttonState.backgroundColor }]}
+          onPress={handlePress}
+        >
+          <Text style={styles.buttonText}>{buttonState.text}</Text>
+        </TouchableOpacity>
+      </View>
+      
+      </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  maincontainer: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#EDF2FC', //  E7EEFB
+    backgroundColor: '#EDF2FC',
+  },
+  buttonWrapper: {
+    width: '100%',
+    alignItems: 'center',
   },
   greeting: {
     fontSize: 20,
@@ -77,7 +99,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   backgroundImage: {
-    borderRadius: 16,
+    borderRadius: 18,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -91,6 +113,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 25,
   },
+  button2: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 25,
+    marginHorizontal: 23,
+  },
   buttonText: {
     color: '#000000',
     textAlign: 'center',
@@ -102,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   waterAmount: {
-    fontSize: 15,
+    fontSize: 18,
     color: "#6A808F",
     marginBottom: 10,
   },
@@ -111,15 +140,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20,
+    alignSelf: 'center',
+    width: '100%',
   },
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 40,
   },
   gifBackground: {
-    width: 133,
-    height: 133,
+    width: 150,
+    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -129,34 +159,20 @@ const styles = StyleSheet.create({
     top: '60%',
     fontWeight: 'bold',
   },
-  targetContainer: {
-    justifyContent: 'center',
-    width: 120
-  },
-  targetBackground: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 10,
-  },
-  targetText: {
-    fontSize: 16,
-    marginBottom: 5, // Ajusta según sea necesario
-  },
-  targetAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5, // Ajusta según sea necesario
-  },
-  dashboardButton: {
-    backgroundColor: '#4286f4',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
   progressMessage: {
     fontSize: 16,
     marginTop: 20,
     textAlign: 'center',
+  },
+  dashboardButton: {
+    backgroundColor: '#69FF3A',
+    padding: 10,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
 });
 
