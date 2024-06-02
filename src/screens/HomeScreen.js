@@ -19,6 +19,9 @@ const HomeScreen = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [showNotificationBadge, setShowNotificationBadge] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [userName, setUserName] = useState('Username');
+  const [buttonPressTime, setButtonPressTime] = useState('11:00 AM');
 
   useEffect(() => {
     if (currentWater >= 90) {
@@ -35,15 +38,29 @@ const HomeScreen = () => {
   }, [currentWater]);
 
   const handlePress = () => {
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setButtonState((prevState) => ({
       text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
       backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
     }));
+
+    if (buttonState.text === 'Apagar') {
+      setButtonPressTime(time);
+    }
   };
 
   const handleNotificationPress = () => {
-    Alert.alert('🚨 Notificaciones', notifications.join('\n\n'));// ⏰ 🚨 ⏲️
+    Alert.alert('🚨 Notificaciones', notifications.join('\n\n'));
     setShowNotificationBadge(false);
+  };
+
+  const handleNamePress = () => {
+    setIsEditingName(true);
+  };
+
+  const handleNameSubmit = () => {
+    setIsEditingName(false);
   };
 
   return (
@@ -51,7 +68,20 @@ const HomeScreen = () => {
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={styles.greeting}>Hola,</Text>
-          <Text style={styles.name}>Jesús GS</Text>
+          {isEditingName ? (
+            <TextInput
+              style={styles.nameInput}
+              value={userName}
+              onChangeText={setUserName}
+              onSubmitEditing={handleNameSubmit}
+              onBlur={handleNameSubmit}
+              autoFocus
+            />
+          ) : (
+            <TouchableOpacity onPress={handleNamePress}>
+              <Text style={styles.name}>{userName}</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationContainer}>
           <Text style={styles.notificationIcon}>🔔</Text>
@@ -59,7 +89,7 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <ImageBackground source={backgroundImage} style={styles.waterContainer} imageStyle={styles.backgroundImage}>
-        <Text style={styles.time}>11:00 AM</Text>
+        <Text style={styles.time}>{buttonPressTime}</Text>
         <Text style={styles.waterAmount}>Tinaco (*Capacidad*)</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button}>
@@ -82,7 +112,7 @@ const HomeScreen = () => {
             />
             <Circle
               size={150}
-              progress={currentWater / targetWater}
+              progress={currentWater / 100} // targetWater
               showsText={false}
               color="#ADE5FC"
               thickness={12}
@@ -166,6 +196,12 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  nameInput: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    // borderBottomWidth: 1,
   },
   waterContainer: {
     padding: 20,
