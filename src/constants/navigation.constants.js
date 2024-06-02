@@ -1,7 +1,6 @@
 export const ROUTES = {
-  home: 'Home',
-  analysis: 'Analysis',
-  alarm: 'Alarm',
-  settings: 'Settings',
-  profile: 'Profile'
+  home: 'Inicio',
+  history: 'Historial de Consumo',
+  prediction: 'Predicción',
+  leaks: 'Fugas de Agua',
 }

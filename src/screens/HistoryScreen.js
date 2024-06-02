@@ -1,46 +1,59 @@
-// screens/AnalysisScreen.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { GlobalContext } from '../wrappers/GlobalState';
 
 const screenWidth = Dimensions.get('window').width;
 
 const AnalysisScreen = () => {
+  const { targetWater } = useContext(GlobalContext);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.header}>For Today</Text>
+        <Text style={styles.header}>🌟 Por Hoy</Text>
         <View style={styles.cardContainer}>
           <View style={styles.cardFullWidth}>
             <Text style={styles.title}>Semanal</Text>
             <BarChart
               data={{
-                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
                 datasets: [
                   {
-                    data: [2.1, 2.5, 2.2, 2.0, 2.3, 2.1, 2.4]
+                    data: [90, 50, 80, 100, 83, 75, 44]
                   }
                 ]
               }}
               width={screenWidth * 0.9}
               height={220}
+              yAxisSuffix=" L"
+              yAxisInterval={1}
               chartConfig={{
                 backgroundColor: "#0000FF",
                 backgroundGradientFrom: "#1E90FF",
                 backgroundGradientTo: "#87CEFA",
-                decimalPlaces: 2,
+                decimalPlaces: 0,
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
                   borderRadius: 16
-                }
+                },
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                propsForLabels: {
+                  fontSize: 12,
+                },
+                barPercentage: 0.7,
               }}
+              verticalLabelRotation={0}
+              fromZero={true}
+              showBarTops={true}
               style={{
                 marginVertical: 8,
-                borderRadius: 16
+                borderRadius: 16,
               }}
+              yLabelsOffset={20}
+              max={targetWater}
             />
-            {/* <Text style={styles.data}>2.1 liters</Text> */}
           </View>
         </View>
         <View style={styles.cardContainer}>
@@ -48,10 +61,14 @@ const AnalysisScreen = () => {
             <Text style={styles.title}>Mensual</Text>
             <LineChart
               data={{
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+                labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"],
                 datasets: [
                   {
                     data: [20, 45, 28, 80, 99, 43, 55]
+                  },
+                  {
+                    data: new Array(7).fill(targetWater),
+                    withDots: false,
                   }
                 ]
               }}
@@ -62,18 +79,19 @@ const AnalysisScreen = () => {
                 backgroundColor: "#0000FF",
                 backgroundGradientFrom: "#1E90FF",
                 backgroundGradientTo: "#87CEFA",
-                decimalPlaces: 2,
+                decimalPlaces: 0,
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
                   borderRadius: 16
-                }
+                },
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               }}
               style={{
                 marginVertical: 8,
                 borderRadius: 16
               }}
+              withHorizontalLines={true}
             />
-            {/* <Text style={styles.data}>2628 Steps Completed</Text> */}
           </View>
         </View>
       </ScrollView>
@@ -92,10 +110,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: 'bold',
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 25,
+    // textAlign: 'center'
   },
   cardContainer: {
     flexDirection: 'row',
@@ -117,11 +136,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  data: {
-    fontSize: 22,
-    color: '#007AFF',
-    fontWeight: 'bold',
   },
 });
 

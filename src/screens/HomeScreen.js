@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, TextInput, Alert } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { Circle } from 'react-native-progress';
+import { GlobalContext } from '../wrappers/GlobalState';
 
 const backgroundImage = require('../../assets/fondo1.png');
-const gifImage = require('../../assets/Animation - water.gif');
+const lottieAnimation = require('../../assets/Animation - 1717208193512.json');
 
 const HomeScreen = () => {
-  const targetWater = 100;
+  const { targetWater, setTargetWater } = useContext(GlobalContext);
+
   const currentWater = 90;
 
   const [buttonState, setButtonState] = useState({
@@ -14,19 +17,47 @@ const HomeScreen = () => {
     backgroundColor: '#69FF3A',
   });
 
+  const [notifications, setNotifications] = useState([]);
+  const [showNotificationBadge, setShowNotificationBadge] = useState(false);
 
-  
-    const handlePress = () => {
-      setButtonState((prevState) => ({
-        text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
-        backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
-      }));
-    };
+  useEffect(() => {
+    if (currentWater >= 90) {
+      const now = new Date();
+      const time = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+      const newNotification = `Se llegó a 90% de agua y se apagó automáticamente a las ${time}`;
+      setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+      setShowNotificationBadge(true);
+      setButtonState({
+        text: 'Encender',
+        backgroundColor: '#69FF3A',
+      });
+    }
+  }, [currentWater]);
+
+  const handlePress = () => {
+    setButtonState((prevState) => ({
+      text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
+      backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
+    }));
+  };
+
+  const handleNotificationPress = () => {
+    Alert.alert('🚨 Notificaciones', notifications.join('\n\n'));// ⏰ 🚨 ⏲️
+    setShowNotificationBadge(false);
+  };
 
   return (
     <View style={styles.maincontainer}>
-      <Text style={styles.greeting}>Hola,</Text>
-      <Text style={styles.name}>Jesús GS</Text>
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.greeting}>Hola,</Text>
+          <Text style={styles.name}>Jesús GS</Text>
+        </View>
+        <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationContainer}>
+          <Text style={styles.notificationIcon}>🔔</Text>
+          {showNotificationBadge && <View style={styles.notificationBadge} />}
+        </TouchableOpacity>
+      </View>
       <ImageBackground source={backgroundImage} style={styles.waterContainer} imageStyle={styles.backgroundImage}>
         <Text style={styles.time}>11:00 AM</Text>
         <Text style={styles.waterAmount}>Tinaco (*Capacidad*)</Text>
@@ -42,7 +73,13 @@ const HomeScreen = () => {
 
       <View style={styles.circleAndTargetContainer}>
         <View style={styles.circleContainer}>
-          <ImageBackground source={gifImage} style={styles.gifBackground}>
+          <View style={styles.gifBackground}>
+            <LottieView
+              source={lottieAnimation}
+              autoPlay
+              loop
+              style={styles.lottieView}
+            />
             <Circle
               size={150}
               progress={currentWater / targetWater}
@@ -50,22 +87,36 @@ const HomeScreen = () => {
               color="#ADE5FC"
               thickness={12}
               borderColor='#F3F7FB'
+              style={styles.circle}
             />
             <Text style={styles.circleText}>{`${currentWater}%`}</Text>
-          </ImageBackground>
+          </View>
+        </View>
+
+        <View style={styles.targetContainer}>
+          <View style={styles.targetBackground}>
+            <Text style={styles.targetText}>Capacidad</Text>
+            <TextInput
+              style={styles.targetAmount}
+              value={targetWater.toString()}
+              onChangeText={(text) => setTargetWater(parseInt(text) || 0)}
+              keyboardType="numeric"
+            />
+            <Text>Litros</Text>
+          </View>
         </View>
       </View>
-      
+
       <View style={styles.buttonWrapper}>
         <TouchableOpacity
           style={[styles.dashboardButton, { backgroundColor: buttonState.backgroundColor }]}
           onPress={handlePress}
+          disabled={currentWater === 90}
         >
           <Text style={styles.buttonText}>{buttonState.text}</Text>
         </TouchableOpacity>
       </View>
-      
-      </View>
+    </View>
   );
 };
 
@@ -74,6 +125,31 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#EDF2FC',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  headerText: {
+    marginRight: 10,
+  },
+  notificationContainer: {
+    position: 'relative',
+  },
+  notificationIcon: {
+    fontSize: 30,
+    marginTop: 10,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'red',
   },
   buttonWrapper: {
     width: '100%',
@@ -84,7 +160,7 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     marginBottom: 5,
     color: "#6A808F",
-    marginTop: 50,
+    marginTop: 30,
   },
   name: {
     fontSize: 30,
@@ -146,6 +222,7 @@ const styles = StyleSheet.create({
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 20,
   },
   gifBackground: {
     width: 150,
@@ -153,11 +230,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  lottieView: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+  },
+  circle: {
+    position: 'absolute',
+  },
   circleText: {
     color: '#FFFFFF',
     position: 'absolute',
     top: '60%',
     fontWeight: 'bold',
+  },
+  targetContainer: {
+    justifyContent: 'center',
+    width: 120,
+    marginLeft: 20,
+  },
+  targetBackground: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 10,
+  },
+  targetText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  targetAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
   progressMessage: {
     fontSize: 16,

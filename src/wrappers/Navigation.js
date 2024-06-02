@@ -6,10 +6,9 @@ import { ROUTES } from '../constants/navigation.constants';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
-import AnalysisScreen from '../screens/AnalysisScreen';
-import AlarmScreen from '../screens/AlarmScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import HistoryScreen from '../screens/HistoryScreen';
+import PredictionScreen from '../screens/PredictionScreen';
+import WaterLeaksScreen from '../screens/WaterLeaksScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -22,41 +21,37 @@ export default function Navigation() {
           let iconName;
 
           switch (route.name) {
-            case 'Home':
+            case 'Inicio':
               iconName = focused ? 'home' : 'home-outline';
               break;
-            case 'Analysis':
+            case 'Historial de Consumo':
               iconName = focused ? 'stats-chart' : 'stats-chart-outline';
               break;
-            case 'Alarm':
-              iconName = focused ? 'alarm' : 'alarm-outline';
+            case 'Predicción':
+              iconName = focused ? 'analytics' : 'analytics-outline';
               break;
-            case 'Settings':
-              iconName = focused ? 'settings' : 'settings-outline';
-              break;
-            case 'Profile':
-              iconName = focused ? 'person' : 'person-outline';
+            case 'Fugas de Agua':
+              iconName = focused ? 'water' : 'water-outline';
               break;
           }
 
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#5DCCFC', // tomato
-        tabBarInactiveTintColor: '#000000', // gray
+        tabBarActiveTintColor: '#5DCCFC',
+        tabBarInactiveTintColor: '#000000',
         tabBarStyle: {
           paddingBottom: 10,
           height: 60,
-          borderTopWidth: 0, // Elimina la línea superior
-          elevation: 0, // Elimina la sombra en Android
+          borderTopWidth: 0,
+          elevation: 0,
         },
         headerShown: false
       })}
     >
       <Tab.Screen name={ROUTES.home} component={HomeScreen} />
-      <Tab.Screen name={ROUTES.analysis} component={AnalysisScreen} />
-      <Tab.Screen name={ROUTES.alarm} component={AlarmScreen} />
-      <Tab.Screen name={ROUTES.settings} component={SettingsScreen} />
-      <Tab.Screen name={ROUTES.profile} component={ProfileScreen} />
+      <Tab.Screen name={ROUTES.history} component={HistoryScreen} />
+      <Tab.Screen name={ROUTES.prediction} component={PredictionScreen} />
+      <Tab.Screen name={ROUTES.leaks} component={WaterLeaksScreen} />
     </Tab.Navigator>
   );
 }

@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 
+import { GlobalProvider } from './src/wrappers/GlobalState';
+
 import { NavigationContainer } from '@react-navigation/native';
 import Navigation from "./src/wrappers/Navigation"
 
@@ -10,7 +12,7 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
   useEffect(() => {
     const prepare = async () => {
-      await new Promise(resolve => setTimeout(resolve, 5000)); // Simula una carga de x segundos
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simula una carga de x segundos
       SplashScreen.hideAsync();
     };
 
@@ -18,8 +20,10 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Navigation />
-    </NavigationContainer>
+    <GlobalProvider>
+      <NavigationContainer>
+        <Navigation />
+      </NavigationContainer>
+    </GlobalProvider>
   );
 }
