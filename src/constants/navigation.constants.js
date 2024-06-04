@@ -3,4 +3,5 @@ export const ROUTES = {
   history: 'Historial de Consumo',
   prediction: 'Predicción',
   leaks: 'Fugas de Agua',
+  perfil: 'Perfil'
 }

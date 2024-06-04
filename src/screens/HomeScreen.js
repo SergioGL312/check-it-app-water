@@ -8,10 +8,10 @@ const backgroundImage = require('../../assets/fondo1.png');
 const lottieAnimation = require('../../assets/Animation - 1717208193512.json');
 
 const HomeScreen = () => {
-  const { targetWater, setTargetWater } = useContext(GlobalContext);
+  const { state, setState } = useContext(GlobalContext);
+  const { targetWater, firstName, lastName, ip } = state;
 
-  const currentWater = 90;
-
+  const [currentWater, setCurrentWater] = useState(0);
   const [buttonState, setButtonState] = useState({
     text: 'Encender',
     backgroundColor: '#69FF3A',
@@ -19,9 +19,25 @@ const HomeScreen = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [showNotificationBadge, setShowNotificationBadge] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [userName, setUserName] = useState('Username');
   const [buttonPressTime, setButtonPressTime] = useState('11:00 AM');
+
+  useEffect(() => {
+    const fetchWaterLevel = async () => {
+      try {
+        const response = await fetch(`http://${ip}/waterLevel`);
+        const data = await response.json();
+        setCurrentWater(data.waterPercentage);
+      } catch (error) {
+        console.error('Error fetching water level:', error);
+      }
+    };
+
+    // const interval = setInterval(fetchWaterLevel, 4000);
+
+    fetchWaterLevel();
+
+    // return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (currentWater >= 90) {
@@ -34,19 +50,42 @@ const HomeScreen = () => {
         text: 'Encender',
         backgroundColor: '#69FF3A',
       });
+
+      const sendRelayOffRequest = async () => {
+        try {
+          const response = await fetch(`http://${ip}/RELAY=OFF`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+        } catch (error) {
+          console.error('Error sending relay off request:', error);
+        }
+      };
+
+      sendRelayOffRequest();
     }
   }, [currentWater]);
 
-  const handlePress = () => {
+  const handlePress = async () => {
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setButtonState((prevState) => ({
-      text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
-      backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
-    }));
 
-    if (buttonState.text === 'Apagar') {
-      setButtonPressTime(time);
+    try {
+      const response = await fetch(`http://${ip}/${buttonState.text === 'Encender' ? 'RELAY=ON' : 'RELAY=OFF'}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      setButtonState((prevState) => ({
+        text: prevState.text === 'Apagar' ? 'Encender' : 'Apagar',
+        backgroundColor: prevState.backgroundColor === '#69FF3A' ? '#FF6347' : '#69FF3A',
+      }));
+
+      if (buttonState.text === 'Apagar') {
+        setButtonPressTime(time);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Hubo un problema con la petición');
     }
   };
 
@@ -68,20 +107,7 @@ const HomeScreen = () => {
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={styles.greeting}>Hola,</Text>
-          {isEditingName ? (
-            <TextInput
-              style={styles.nameInput}
-              value={userName}
-              onChangeText={setUserName}
-              onSubmitEditing={handleNameSubmit}
-              onBlur={handleNameSubmit}
-              autoFocus
-            />
-          ) : (
-            <TouchableOpacity onPress={handleNamePress}>
-              <Text style={styles.name}>{userName}</Text>
-            </TouchableOpacity>
-          )}
+          <Text style={styles.name}>{firstName} {lastName}</Text>
         </View>
         <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationContainer}>
           <Text style={styles.notificationIcon}>🔔</Text>
@@ -129,7 +155,7 @@ const HomeScreen = () => {
             <TextInput
               style={styles.targetAmount}
               value={targetWater.toString()}
-              onChangeText={(text) => setTargetWater(parseInt(text) || 0)}
+              onChangeText={(text) => setState({ ...state, targetWater: parseInt(text) || 0})}
               keyboardType="numeric"
             />
             <Text>Litros</Text>
@@ -196,12 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  nameInput: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    // borderBottomWidth: 1,
   },
   waterContainer: {
     padding: 20,

@@ -9,6 +9,7 @@ import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import PredictionScreen from '../screens/PredictionScreen';
 import WaterLeaksScreen from '../screens/WaterLeaksScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,8 @@ export default function Navigation() {
             case 'Fugas de Agua':
               iconName = focused ? 'water' : 'water-outline';
               break;
+            case 'Perfil':
+              iconName = focused ? 'person' : 'person-outline';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -52,6 +55,7 @@ export default function Navigation() {
       <Tab.Screen name={ROUTES.history} component={HistoryScreen} />
       <Tab.Screen name={ROUTES.prediction} component={PredictionScreen} />
       <Tab.Screen name={ROUTES.leaks} component={WaterLeaksScreen} />
+      <Tab.Screen name={ROUTES.perfil} component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

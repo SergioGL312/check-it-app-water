@@ -44,7 +44,8 @@ const AlarmScreen = () => {
   
   const { backgroundColor, backgroundGradientFrom, backgroundGradientTo } = getChartColors(weeklyData);
 
-  const { targetWater } = useContext(GlobalContext);
+  const { state } = useContext(GlobalContext);
+  const { targetWater } = state;
 
   return (
     <SafeAreaView style={styles.safeArea}>

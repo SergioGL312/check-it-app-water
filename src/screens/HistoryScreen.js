@@ -7,7 +7,8 @@ import { GlobalContext } from '../wrappers/GlobalState';
 const screenWidth = Dimensions.get('window').width;
 
 const AnalysisScreen = () => {
-  const { targetWater } = useContext(GlobalContext);
+  const { state } = useContext(GlobalContext);
+  const { targetWater } = state;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -21,7 +22,8 @@ const AnalysisScreen = () => {
                 labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
                 datasets: [
                   {
-                    data: [90, 50, 80, 100, 83, 75, 44]
+                    // data: [90, 50, 80, 100, 83, 75, 44]
+                    data: [90, 50, 80, 0, 0, 0, 0]
                   }
                 ]
               }}
@@ -64,7 +66,7 @@ const AnalysisScreen = () => {
                 labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"],
                 datasets: [
                   {
-                    data: [20, 45, 28, 80, 99, 43, 55]
+                    data: [20, 45, 28, 80, 99, 43, 0]
                   },
                   {
                     data: new Array(7).fill(targetWater),
