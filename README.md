@@ -6,3 +6,5 @@
 
     npm install react-native-progress react-native-svg
     npm install react-native-svg
+    npm install @react-navigation/stack
+    npm install react-native-gesture-handler

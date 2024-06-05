@@ -16,14 +16,14 @@ const AnalysisScreen = () => {
         <Text style={styles.header}>🌟 Por Hoy</Text>
         <View style={styles.cardContainer}>
           <View style={styles.cardFullWidth}>
-            <Text style={styles.title}>Semanal</Text>
+            <Text style={styles.title}>Consumo Semanal</Text>
             <BarChart
               data={{
                 labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
                 datasets: [
                   {
                     // data: [90, 50, 80, 100, 83, 75, 44]
-                    data: [90, 50, 80, 0, 0, 0, 0]
+                    data: [100, 86, 15, 0, 0, 0, 0]
                   }
                 ]
               }}
@@ -60,13 +60,13 @@ const AnalysisScreen = () => {
         </View>
         <View style={styles.cardContainer}>
           <View style={styles.cardFullWidth}>
-            <Text style={styles.title}>Mensual</Text>
+            <Text style={styles.title}>Consumo Mensual</Text>
             <LineChart
               data={{
                 labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"],
                 datasets: [
                   {
-                    data: [20, 45, 28, 80, 99, 43, 0]
+                    data: [0, 0, 0, 80, 99, 13, 0]
                   },
                   {
                     data: new Array(7).fill(targetWater),

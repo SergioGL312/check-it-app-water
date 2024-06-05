@@ -9,6 +9,7 @@ export const GlobalProvider = ({ children }) => {
     firstName: 'Joaquin',
     lastName: '',
     ip: '192.168.0.2:3000',
+    sec: 4
   });
 
   return (

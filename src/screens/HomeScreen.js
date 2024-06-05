@@ -1,15 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, TextInput, Alert, RefreshControl } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { Circle } from 'react-native-progress';
 import { GlobalContext } from '../wrappers/GlobalState';
+import { ScrollView } from 'react-native-gesture-handler';
+import { ROUTES } from '../constants/navigation.constants';
 
 const backgroundImage = require('../../assets/fondo1.png');
 const lottieAnimation = require('../../assets/Animation - 1717208193512.json');
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const { state, setState } = useContext(GlobalContext);
-  const { targetWater, firstName, lastName, ip } = state;
+  const { targetWater, firstName, lastName, ip, sec } = state;
 
   const [currentWater, setCurrentWater] = useState(0);
   const [buttonState, setButtonState] = useState({
@@ -20,6 +22,15 @@ const HomeScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotificationBadge, setShowNotificationBadge] = useState(false);
   const [buttonPressTime, setButtonPressTime] = useState('11:00 AM');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
 
   useEffect(() => {
     const fetchWaterLevel = async () => {
@@ -32,12 +43,12 @@ const HomeScreen = () => {
       }
     };
 
-    // const interval = setInterval(fetchWaterLevel, 4000);
+    const interval = setInterval(fetchWaterLevel, sec * 1000);
 
     fetchWaterLevel();
 
-    // return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval);
+  }, [currentWater, refreshing, ip]);
 
   useEffect(() => {
     if (currentWater >= 90) {
@@ -85,98 +96,110 @@ const HomeScreen = () => {
         setButtonPressTime(time);
       }
     } catch (error) {
-      Alert.alert('Error', 'Hubo un problema con la petición');
+      Alert.alert('⚠️ Error', 'Hubo un problema con la petición');
     }
   };
 
   const handleNotificationPress = () => {
-    Alert.alert('🚨 Notificaciones', notifications.join('\n\n'));
-    setShowNotificationBadge(false);
+    if (notifications.length === 0) {
+      Alert.alert('🚨 Notificaciones', 'No hay notificaciones todavía.');
+    } else {
+      Alert.alert('🚨 Notificaciones', notifications.join('\n\n'));
+      setShowNotificationBadge(false);
+    }
   };
 
-  const handleNamePress = () => {
-    setIsEditingName(true);
-  };
-
-  const handleNameSubmit = () => {
-    setIsEditingName(false);
-  };
 
   return (
-    <View style={styles.maincontainer}>
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.greeting}>Hola,</Text>
-          <Text style={styles.name}>{firstName} {lastName}</Text>
-        </View>
-        <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationContainer}>
-          <Text style={styles.notificationIcon}>🔔</Text>
-          {showNotificationBadge && <View style={styles.notificationBadge} />}
-        </TouchableOpacity>
-      </View>
-      <ImageBackground source={backgroundImage} style={styles.waterContainer} imageStyle={styles.backgroundImage}>
-        <Text style={styles.time}>{buttonPressTime}</Text>
-        <Text style={styles.waterAmount}>Tinaco (*Capacidad*)</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Más</Text>
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#9Bd35A', '#689F38']}
+        />
+      }
+    >
+      <View style={styles.maincontainer}>
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            <Text style={styles.greeting}>Hola,</Text>
+            <Text style={styles.name}>{firstName} {lastName}</Text>
+          </View>
+          <TouchableOpacity onPress={handleNotificationPress} style={styles.notificationContainer}>
+            <Text style={styles.notificationIcon}>🔔</Text>
+            {showNotificationBadge && <View style={styles.notificationBadge} />}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button2}>
-            <Text style={styles.buttonText}>Cambiar</Text>
-          </TouchableOpacity>
         </View>
-      </ImageBackground>
+        <ImageBackground source={backgroundImage} style={styles.waterContainer} imageStyle={styles.backgroundImage}>
+          <Text style={styles.time}>{buttonPressTime}</Text>
+          <Text style={styles.waterAmount}>Tinaco (*Capacidad*)</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(ROUTES.history)}>
+              <Text style={styles.buttonText}>Más</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button2} onPress={() => Alert.alert('Aviso ❗', 'No se pudo detectar otro recipiente.')}>
+              <Text style={styles.buttonText}>Cambiar</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
 
-      <View style={styles.circleAndTargetContainer}>
-        <View style={styles.circleContainer}>
-          <View style={styles.gifBackground}>
-            <LottieView
-              source={lottieAnimation}
-              autoPlay
-              loop
-              style={styles.lottieView}
-            />
-            <Circle
-              size={150}
-              progress={currentWater / 100} // targetWater
-              showsText={false}
-              color="#ADE5FC"
-              thickness={12}
-              borderColor='#F3F7FB'
-              style={styles.circle}
-            />
-            <Text style={styles.circleText}>{`${currentWater}%`}</Text>
+        <View style={styles.circleAndTargetContainer}>
+          <View style={styles.circleContainer}>
+            <View style={styles.gifBackground}>
+              <LottieView
+                source={lottieAnimation}
+                autoPlay
+                loop
+                style={styles.lottieView}
+              />
+              <Circle
+                size={150}
+                progress={currentWater / 100} // targetWater
+                showsText={false}
+                color="#ADE5FC"
+                thickness={12}
+                borderColor='#F3F7FB'
+                style={styles.circle}
+              />
+              <Text style={styles.circleText}>{`${currentWater}%`}</Text>
+            </View>
+          </View>
+
+          <View style={styles.targetContainer}>
+            <View style={styles.targetBackground}>
+              <Text style={styles.targetText}>Capacidad</Text>
+              <TextInput
+                style={styles.targetAmount}
+                value={targetWater.toString()}
+                onChangeText={(text) => setState({ ...state, targetWater: parseInt(text) || 0 })}
+                keyboardType="numeric"
+              />
+              <Text>Litros</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.targetContainer}>
-          <View style={styles.targetBackground}>
-            <Text style={styles.targetText}>Capacidad</Text>
-            <TextInput
-              style={styles.targetAmount}
-              value={targetWater.toString()}
-              onChangeText={(text) => setState({ ...state, targetWater: parseInt(text) || 0})}
-              keyboardType="numeric"
-            />
-            <Text>Litros</Text>
-          </View>
+        <View style={styles.buttonWrapper}>
+          <TouchableOpacity
+            style={[styles.dashboardButton, { backgroundColor: buttonState.backgroundColor }]}
+            onPress={handlePress}
+            disabled={currentWater === 90}
+          >
+            <Text style={styles.buttonText}>{buttonState.text}</Text>
+          </TouchableOpacity>
         </View>
       </View>
+    </ScrollView>
 
-      <View style={styles.buttonWrapper}>
-        <TouchableOpacity
-          style={[styles.dashboardButton, { backgroundColor: buttonState.backgroundColor }]}
-          onPress={handlePress}
-          disabled={currentWater === 90}
-        >
-          <Text style={styles.buttonText}>{buttonState.text}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
   maincontainer: {
     flex: 1,
     padding: 20,

@@ -40,7 +40,7 @@ const getChartColors = (data) => {
 };
 
 const AlarmScreen = () => {
-  const weeklyData = [90, 50, 80, 100, 83, 75, 44];
+  const weeklyData = [96.48, 112.25, 86.77, 137.51, 83.55, 113.55, 112.55]; // [90, 50, 80, 100, 83, 75, 44]
   
   const { backgroundColor, backgroundGradientFrom, backgroundGradientTo } = getChartColors(weeklyData);
 
@@ -86,7 +86,7 @@ const AlarmScreen = () => {
           </View>
         </View>
         
-        <Text style={styles.goalHeader}>Consejos para evitar el consumo excesivo de agua</Text>
+        <Text style={styles.goalHeader}>🤔 Consejos para evitar el consumo excesivo de agua</Text>
         <Text style={styles.goalSubHeader}>Aquí tienes algunos consejos para ahorrar agua.</Text>
         <View style={styles.goalsContainer}>
           <GoalCard title="Duchas más cortas" amount="Ahorre agua reduciendo el tiempo de ducha" icon="🚿" />
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   goalHeader: {
     fontSize: 21,
     fontWeight: 'bold',
-    marginTop: 30,
+    marginTop: 5,
     marginBottom: 10,
     textAlign: 'center',
   },

@@ -51,6 +51,7 @@ export default function Navigation() {
         headerShown: false
       })}
     >
+      {/* <Tab.Screen name={ROUTES.p} component={FullScreenAnimation} /> */}
       <Tab.Screen name={ROUTES.home} component={HomeScreen} />
       <Tab.Screen name={ROUTES.history} component={HistoryScreen} />
       <Tab.Screen name={ROUTES.prediction} component={PredictionScreen} />
